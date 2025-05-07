@@ -64,14 +64,14 @@ Essentially, `_>` is a bunch of clojure.core's `as->` and `->` wrapped into top 
 ### Why
 1. `->` `->>` `some->` `some->>` `cond->` `cond->>` – notice how many already, **oof** 
 2. They implicitly put prev form into next, which is same amount of letters as in onion nested form, but readable, **nice**
-3. However each has its own fixed place where prev from goes. This means you need to 1) plan your arrows beforehand, and 2) often rewrite when adding expressions later, **oof**
-4. You can nest `->>`kin inside `->`kin, but not vise versa, makes rewrites and planning even more unpleasant, **oof**
+3. However each has its own fixed place where prev form goes. This means you need to 1) plan your arrows beforehand, and 2) often rewrite when adding expressions later, **oof**
+4. You can nest `->>`kin inside `->`kin, but not vice versa, makes rewrites and planning even more unpleasant, **oof**
 5. This generates larger git diffs, **oof**
 6. This increases nestedness and indentation level, however, conceptually you are still threading, **oof**
 7. They wrap "scalar" forms-without-parens with parens, e.g. `(-> x f)` -> `(-> x (f))` -> `(f x)`, **nice**
 8. None of those above can thread into some middle arg position `(f a _ b)`, but `as->` can, **nice**
 9. But that's another one to plan and rewrite, **oof**
-10. And it can't be transitioned into from `->>`kin, ***oof*
+10. And it can't be transitioned into from `->>`kin, **oof**
 11. So maybe lets just use only `as->`? But it requires you to always specify placeholder. Tedious, but it is good for readability and maintenance, **ok**
 12. But it can't auto-wrap scalars with parens, and what is THAT? `(as-> 1 _ inc) => #object[clojure.core$inc]`, **big oof**
 13. Brevity is very important:`(-> x foo bar baz)` vs `(as-> x _ (foo _) (bar _) (baz _)`, **oof** again
