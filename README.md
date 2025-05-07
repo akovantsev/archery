@@ -15,7 +15,7 @@
 ```clojure
 (ns foo.bar.baz
   (:require 
-   [com.akovantsev.archery :refer [some_> _>]]))
+   [com.akovantsev.archery :refer [some_> _> _]]))
 ```
 
 Or, if you are feeling extra adventurous:
@@ -23,8 +23,7 @@ Or, if you are feeling extra adventurous:
 (ns foo.bar.baz
   (:refer-clojure :exclude [-> ->> some-> some->>])
   (:require
-   [com.akovantsev.archery :refer [some_> _>]
-    :rename {_> ->, some_> some->}]))
+   [com.akovantsev.archery :refer [some_> _> _] :rename {_> ->, some_> some->}]))
 ```
 
 ### some_>
