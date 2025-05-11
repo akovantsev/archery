@@ -1,6 +1,7 @@
 (ns com.akovantsev.archery
   (:require
-   [clojure.set :as set]))
+   [clojure.set :as set]
+   [clojure.walk :as walk]))
 
 
 (def _ (symbol "_"))
@@ -31,9 +32,11 @@
 (defn -impl_> [x exprs core-arrow-sym]
   (let [>?       (-quiver)
         >form?   (fn [x] (and (-> x seq?) (-> x first >?)))
-        has_?    (fn [x] (->> x (tree-seq coll? seq) (some #{_}) boolean))
+        ;; if _> contains _ after first arg - it is new _, not top level _:
+        wf       (fn [x] (if (>form? x) (take 2 x) x)) ;; (_> _ foo bar) ~> (_> _)
+        has_?    (fn [x] (->> x (walk/postwalk wf) (tree-seq coll? seq) (some #{_}) boolean))
         mb-wrap  (fn [x] (cond
-                           (>form? x) (list core-arrow-sym x)
+                           (>form? x) x
                            (has_? x)  (list `as-> _ x)
                            :else      (list core-arrow-sym x)))]
     (->> exprs (mapv mb-wrap) (cons x))))

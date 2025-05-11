@@ -92,6 +92,40 @@
 (assert-expands-to (_>> x (map inc) (filter nil?) (remove _ _) inc)  (inc (let* [_ (filter nil? (map inc x))] (remove _ _))))
 
 
+;; top level _> does not get wrapped in anything ever:
+(assert= (macroexpand-1 '(_> x (_> inc dec _)))     (clojure.core/-> x (_> inc dec _)))
+(assert= (macroexpand-1 '(_> x (_> _ inc dec _)))   (clojure.core/-> x (_> _ inc dec _)))
+(assert= (macroexpand-1 '(_>> x (_>> inc dec _)))   (clojure.core/-> x (_>> inc dec _)))
+(assert= (macroexpand-1 '(_>> x (_>> _ inc dec _))) (clojure.core/-> x (_>> _ inc dec _)))
+
+
+;; _ in deeper _> after 1st arg are ignored and containing top level form is not wrapped in as->:
+(assert= (macroexpand-1 '(_> x (inc (_> inc dec _))))
+  (clojure.core/-> x
+    (clojure.core/-> (inc (_> inc dec _)))))
+
+(assert= (macroexpand-1 '(_>> x (inc (_> inc dec _))))
+  (clojure.core/-> x
+    (clojure.core/->> (inc (_> inc dec _)))))
+
+;; _ in deeper _> as 1st arg triggers wrap in as->:
+(assert= (macroexpand-1 '(_> x (inc (_> _ inc dec))))
+  (clojure.core/-> x
+    (clojure.core/as-> _ (inc (_> _ inc dec)))))
+
+(assert= (macroexpand-1 '(_> x (inc (some_> _ inc dec _))))
+  (clojure.core/-> x
+    (clojure.core/as-> _ (inc (some_> _ inc dec _)))))
+
+(assert= (macroexpand-1 '(_>> x (inc (some_>> _ inc dec))))
+  (clojure.core/-> x
+    (clojure.core/as-> _ (inc (some_>> _ inc dec)))))
+
+(assert= (macroexpand-1 '(_>> x (inc (_>> _ inc dec _))))
+  (clojure.core/-> x
+    (clojure.core/as-> _ (inc (_>> _ inc dec _)))))
+
+
 (assert-expands-to
   (_>> x
     (into []
